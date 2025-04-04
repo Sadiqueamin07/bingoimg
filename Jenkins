@@ -5,7 +5,7 @@ pipeline {
         // Define your S3 bucket name
         S3_BUCKET = 'my-image011'
         // Define the directory with images (relative to workspace)
-        IMAGE_DIR = 'my-images011'
+        IMAGE_DIR = 'my-image011'
         // AWS credentials ID from Jenkins (optional if using IAM role)
         AWS_CREDENTIALS = credentials('Sadiqueam07@gmail.com') // Replace with your Jenkins credential ID
     }
@@ -24,7 +24,7 @@ pipeline {
                     // Configure AWS credentials (if not using an IAM role)
                     withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'Sadiqueam07@gmail.com']]) {
                         // Upload all images from the specified directory to S3
-                        sh "aws s3 cp ${IMAGE_DIR}/ s3://${S3_BUCKET}/ --recursive --include '*.jpg' --include '*.png'"
+                        sh "aws s3 cp ${my-image011}/ s3://${my-image011}/ --recursive --include '*.jpg' --include '*.png'"
                     }
                 }
             }
@@ -34,8 +34,8 @@ pipeline {
             steps {
                 script {
                     // List the contents of the S3 bucket to verify upload
-                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials-id']]) {
-                        sh "aws s3 ls s3://${S3_BUCKET}/"
+                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'Sadiqueam07@gmail.com']]) {
+                        sh "aws s3 ls s3://${my-image011}/"
                     }
                 }
             }
