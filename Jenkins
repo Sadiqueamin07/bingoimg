@@ -1,58 +1,16 @@
 pipeline {
     agent any
-    
     stages {
-        stage('Prepare Workspace') {
+        stage('Build with Version') {
             steps {
-                // Clean workspace before starting
-                cleanWs()
-                
-                // Write the HTML file to workspace
-                writeFile file: 'index.html', text: '''
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hello World</title>
-</head>
-<body>
-    <h1>Hello World</h1>
-    <img src="https://via.placeholder.com/300" alt="Sample Image">
-</body>
-</html>
-'''
+                sh "java --version"
+                sh "ls || dir" // Handles both Linux (ls) and Windows (dir)
             }
         }
-        
-        stage('Git Push') {
+        stage('Deploy') {
             steps {
-                // Configure Git user
-                sh 'git config --global user.email "jenkins@example.com"'
-                sh 'git config --global user.name "Jenkins"'
-
-                // Using credentials to push to repository
-                withCredentials([usernamePassword(credentialsId: 'git-credentials-id', 
-                                                usernameVariable: 'GIT_USERNAME', 
-                                                passwordVariable: 'GIT_PASSWORD')]) {
-                    sh '''
-                        git init
-                        git add index.html
-                        git commit -m "Jenkins: Add HTML file with image"
-                        git remote add origin https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/your-username/your-repo.git
-                        git push -u origin main
-                    '''
-                }
+                sh "aws s3 cp index.html s3://mycontentnode.js/"
             }
-        }
-    }
-    
-    post {
-        success {
-            echo 'HTML file successfully pushed to repository!'
-        }
-        failure {
-            echo 'Failed to push HTML file to repository'
         }
     }
 }
