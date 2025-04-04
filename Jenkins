@@ -1,16 +1,53 @@
 pipeline {
-    agent any
+    agent any // Runs on any available Jenkins agent
+    
+    environment {
+        // Define your S3 bucket name
+        S3_BUCKET = 'my-image011'
+        // Define the directory with images (relative to workspace)
+        IMAGE_DIR = 'my-images011'
+        // AWS credentials ID from Jenkins (optional if using IAM role)
+        AWS_CREDENTIALS = credentials('Sadiqueam07@gmail.com') // Replace with your Jenkins credential ID
+    }
+    
     stages {
-        stage('Build with Version') {
+        stage('Checkout') {
             steps {
-                sh "java --version"
-                sh "ls || dir" // Handles both Linux (ls) and Windows (dir)
+                // Checkout code from your repository
+                git 'https://github.com/Sadiqueamin07/bingoimg.git' // Replace with your repo URL
             }
         }
-        stage('Deploy') {
+        
+        stage('Upload Images to S3') {
             steps {
-                sh "aws s3 cp index.html s3://mycontentnode.js/"
+                script {
+                    // Configure AWS credentials (if not using an IAM role)
+                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'Sadiqueam07@gmail.com']]) {
+                        // Upload all images from the specified directory to S3
+                        sh "aws s3 cp ${IMAGE_DIR}/ s3://${S3_BUCKET}/ --recursive --include '*.jpg' --include '*.png'"
+                    }
+                }
             }
+        }
+        
+        stage('Verify S3 Content') {
+            steps {
+                script {
+                    // List the contents of the S3 bucket to verify upload
+                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials-id']]) {
+                        sh "aws s3 ls s3://${S3_BUCKET}/"
+                    }
+                }
+            }
+        }
+    }
+    
+    post {
+        success {
+            echo 'Images successfully uploaded to S3 and verified!'
+        }
+        failure {
+            echo 'Something went wrong. Check the logs.'
         }
     }
 }
